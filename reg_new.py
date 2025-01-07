@@ -9,7 +9,6 @@ import face_recognition
 import firebase_admin
 from firebase_admin import credentials, db, storage
 import numpy as np
-import uuid
 # Initialize Firebase
 cred = credentials.Certificate('firebase/credentials.json')
 firebase_admin.initialize_app(cred, {
