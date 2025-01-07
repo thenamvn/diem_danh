@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
-from PySide2.QtCore import QCoreApplication, QMetaObject, QRect, QThread, Signal, Qt
-from PySide2.QtGui import QIcon, QPixmap, QImage
-from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QGroupBox, QLabel, QLineEdit, QFrame
+from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, QThread, Signal, Qt
+from PySide6.QtGui import QIcon, QPixmap, QImage
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QGroupBox, QLabel, QLineEdit, QFrame
 import cv2
 import face_recognition
 import os
