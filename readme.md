@@ -20,10 +20,14 @@ Firebase Integration: Store face data in Firebase for easy access and synchroniz
 * Python 3.9.21
 ### Required Libraries:
 * pip install dlib (dlib-19.22.99-cp39-cp39-win_amd64.whl)
+* pip install numpy (**used 1.26.4**)
 * pip install face-recognition
 * pip install opencv-python
 * pip install PySide6
 * pip install firebase-admin
+##### RuntimeError: Unsupported image type, must be 8bit gray or RGB image.
+* I **downgraded numpy** to version **1.26.4** and it worked again
+* **numpy** version 2.x.x not compatible with **face-recognition**
 ## Setup
 ##### 1. Clone the repository
 <pre>
@@ -32,10 +36,10 @@ git clone https://github.com/yourusername/face-attendance.git
 </code>
 </pre>
 ##### 2. Firebase Setup:
-* Place your Firebase credentials file in the "firebase" folder and name it "credentials.json".
+* Place your Firebase credentials file in the **firebase** folder and name it **credentials.json**.
 * How to get : https://stackoverflow.com/questions/40799258/where-can-i-get-serviceaccountcredentials-json-for-firebase-admin
 ##### 3. Google Sheets Setup:
-* Place your Google Sheets API credentials file in the root directory and name it client_secret.json.
+* Place your Google Sheets API credentials file in the root directory and name it **client_secret.json**
 * How to get: https://stackoverflow.com/questions/40136699/using-google-api-for-python-where-do-i-get-the-client-secrets-json-file-from
 
 ## Usage
