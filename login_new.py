@@ -249,6 +249,8 @@ class FaceRecognitionApp(QMainWindow):
         self.face_recognition_thread.face_recognized_signal.connect(self._update_face_info)
         self.face_recognition_thread.face_not_recognized_signal.connect(self._clear_face_info)
         self.face_recognition_thread.start()
+        # Listen for changes in Firebase database
+        self._setup_firebase_listener()
 
     def _update_video_frame(self, pixmap):
         self.ui.label_2.setPixmap(pixmap)
@@ -296,6 +298,16 @@ class FaceRecognitionApp(QMainWindow):
                     self.known_face_names.append(face_data['name'])
                     self.known_face_ids.append(face_data['id'])
         print("Loaded known faces from Firebase successfully!")
+
+    def _setup_firebase_listener(self):
+            # Set up a listener for changes in the Firebase database
+        def face_data_changed(event):
+            if event.data is not None:  # Check if data exists (not a remove operation)
+                self._load_known_faces_firebase()  # Reload face data
+                print("Firebase data changed, updated known faces")
+            else:
+                print("A face entry has been removed from Firebase.")
+        db_ref.listen(face_data_changed)
 
     def closeEvent(self, event):
         self.video_player.stop()

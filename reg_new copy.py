@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import sys
 from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, QThread, Signal, Qt, QTimer
 from PySide6.QtGui import QIcon, QPixmap, QImage
@@ -226,6 +224,8 @@ class FaceRecognitionThread(QThread):
 class FirebaseUploadThread(QThread):
     upload_complete_signal = Signal(bool, str)
     progress_signal = Signal(int, str)
+    confirmation_needed_signal = Signal(str)
+    upload_decision_signal = Signal(bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -233,6 +233,7 @@ class FirebaseUploadThread(QThread):
         self.extended_image = None
         self.name = None
         self.student_id = None
+        self.should_upload = None
 
     def set_data(self, face_image, extended_image, name, student_id):
         self.face_image = face_image
@@ -240,16 +241,39 @@ class FirebaseUploadThread(QThread):
         self.name = name
         self.student_id = student_id
 
+    def set_upload_decision(self, should_upload):
+        self.should_upload = should_upload
+
     def run(self):
         try:
             if self.face_image is not None and self.extended_image is not None:
+                # Check for duplicate ID
                 existing_faces = db_ref.get()
-                face_key_to_delete = None
-                for key, value in existing_faces.items():
-                    if value['id'] == self.student_id:
-                        face_key_to_delete = key
-                        break
-                self.progress_signal.emit(10, "Deleting old face data...")
+                face_key_to_delete = None  # Variable to store the key of the face entry to be deleted
+                if existing_faces:
+                    for key, face_data in existing_faces.items():
+                        if face_data.get('id') == self.student_id:
+                            # Emit signal to Main thread to get confirmation
+                            self.confirmation_needed_signal.emit(
+                                self.student_id)
+                            self.upload_decision_signal.connect(
+                                self.set_upload_decision)
+
+                            while self.should_upload is None:  # Wait for response from main thread
+                                QThread.msleep(100)
+                            self.upload_decision_signal.disconnect(
+                                self.set_upload_decision)
+
+                            if not self.should_upload:  # Upload is cancelled
+                                self.should_upload = None  # reset for next call
+                                self.upload_complete_signal.emit(
+                                    False, "Upload cancelled by user")
+                                self.progress_signal.emit(0, "")
+                                return
+
+                            face_key_to_delete = key  # Save key to delete after the loop
+                            break  # Exit loop if user agrees to replace the data
+                # Delete the old database entry, if any.
                 if face_key_to_delete:
                     db_ref.child(face_key_to_delete).delete()
                 self.progress_signal.emit(25, "Encoding images...")
@@ -334,6 +358,8 @@ class FaceRecognitionApp(QMainWindow):
             self.handle_upload_result)
         self.firebase_upload_thread.progress_signal.connect(
             self.update_progress)
+        self.firebase_upload_thread.confirmation_needed_signal.connect(
+            self.show_confirmation_dialog)
 
     def update_video_frame(self, pixmap):
         self.ui.label_2.setPixmap(pixmap)
@@ -404,6 +430,20 @@ class FaceRecognitionApp(QMainWindow):
     def update_progress(self, value, message):
         self.ui.progressBar.setValue(value)
         self.ui.statusLabel.setText(message)
+
+    def show_confirmation_dialog(self, student_id):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Confirmation")
+        msg_box.setText(
+            f"Student ID '{student_id}' already exists. Do you want to replace it?")
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.addButton(QMessageBox.Yes)
+        msg_box.addButton(QMessageBox.No)
+        result = msg_box.exec()
+        if result == QMessageBox.Yes:
+            self.firebase_upload_thread.set_upload_decision(True)
+        else:
+            self.firebase_upload_thread.set_upload_decision(False)
 
     def closeEvent(self, event):
         self.video_player.stop()
