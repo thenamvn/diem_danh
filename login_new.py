@@ -171,8 +171,16 @@ class FaceRecognitionThread(QThread):
                     frame_rgb = small_frame[:, :, ::-1]
                     face_locations = face_recognition.face_locations(frame_rgb)
                     if face_locations:
-                        frame_center = (frame.shape[1] // 2, frame.shape[0] // 2)
-                        best_match_index = self.get_best_match_index(face_locations, frame_center)
+                        # Tìm khuôn mặt lớn nhất
+                        max_area = 0
+                        best_match_index = None
+                        for i, face_location in enumerate(face_locations):
+                            top, right, bottom, left = face_location
+                            area = (bottom - top) * (right - left)  # Diện tích của khuôn mặt
+                            if area > max_area:
+                                max_area = area
+                                best_match_index = i
+                        # Xử lý khuôn mặt lớn nhất
                         if best_match_index is not None:
                             face_encoding = face_recognition.face_encodings(frame_rgb, [face_locations[best_match_index]])[0]
                             face_distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
