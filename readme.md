@@ -9,11 +9,14 @@ Face Registration: Capture and register faces with names and IDs.
 Face Recognition: Recognize registered faces and mark attendance.
 Google Sheets Integration: Store attendance records in a Google Sheet.
 Firebase Integration: Store face data in Firebase for easy access and synchronization.
+
+### Anti Spoofing using Canny edge detector
+[![Figure-1-Spoofing-test.jpg](https://i.postimg.cc/fTfWjCM7/Figure-1-Spoofing-test.jpg)](https://postimg.cc/TphXTrLh)
 ## Screenshots
 #### Face Registration Interface
 [![image.png](https://i.postimg.cc/DZ1CHvGY/image.png)](https://postimg.cc/bDNH2j3Q)
 #### Login Interface
-[![image.png](https://i.postimg.cc/DZ1CHvGY/image.png)](https://postimg.cc/bDNH2j3Q)
+[![Untitled-1.jpg](https://i.postimg.cc/XqFqb0Mt/Untitled-1.jpg)](https://postimg.cc/XBj4fmYg)
 
 ## Installation
 #### VERSION TESTED
@@ -52,5 +55,5 @@ python reg_new.py
 ### 2. Run the Login Interface:
 <pre>
 <code>
-python login_new.py
+python login_pro.py
 </code>
