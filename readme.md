@@ -6,10 +6,10 @@ This project is a face recognition-based attendance system. It includes a regist
 
 ### Features
 
-Face Registration: Capture and register faces with names and IDs.
-Face Recognition: Recognize registered faces and mark attendance.
-Google Sheets Integration: Store attendance records in a Google Sheet.
-Firebase Integration: Store face data in Firebase for easy access and synchronization.
+* Face Registration: Capture and register faces with names and IDs.
+* Face Recognition: Recognize registered faces and mark attendance.
+* Google Sheets Integration: Store attendance records in a Google Sheet.
+* Firebase Integration: Store face data in Firebase for easy access and synchronization.
 
 ### Anti Spoofing using Canny edge detector
 
